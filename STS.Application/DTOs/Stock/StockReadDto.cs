@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STS.Application.DTOs.StockMovements
+namespace STS.Application.DTOs.Stock
 {
-   public class StockMovementReadDto
+    class StockReadDto
     {
         public int Id { get; set; }
-        public MovementType Type { get; set; }
+        public int ProductId { get; set;}
+        public string ProductName { get; set; }
+        public Store Store { get; set; }
         public double Quantity { get; set; }
-        public DateTime Date { get; set; }
-        public string ProductName { get;set; }
     }
 }

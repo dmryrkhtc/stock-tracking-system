@@ -6,16 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace STS.Application.DTOs.StockMovements
+namespace STS.Application.DTOs.Stock
 {
-    public class StockMovementUpdateDto
+    class StockUpdateDto
     {
         [Required]
-        public MovementType Type { get; set; }// girdi cikti durumu
+        public Store Store { get; set; }
         [Required]
         public double Quantity { get; set; }
-        [Required]
-        public DateTime Date { get; set; }
 
     }
 }

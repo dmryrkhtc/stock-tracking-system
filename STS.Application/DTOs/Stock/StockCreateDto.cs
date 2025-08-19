@@ -1,24 +1,20 @@
-﻿using System;
+﻿using STS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using STS.Domain.Entities; //movementtype bulunsun diye
 
-namespace STS.Application.DTOs.StockMovements
+namespace STS.Application.DTOs.Stock
 {
-    public class StokMovementCreateDto
+    class StockCreateDto
     {
         [Required]
         public int ProductId { get; set; }
         [Required]
-        public MovementType Type { get; set; } //girdi cikti
-
+        public Store Store { get; set; }
         [Required]
         public double Quantity { get; set; }
-        [Required]
-        public DateTime Date { get; set; }
-
     }
 }
