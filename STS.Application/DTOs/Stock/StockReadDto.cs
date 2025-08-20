@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace STS.Application.DTOs.Stock
 {
-    class StockReadDto
+    public class StockReadDto
     {
         public int Id { get; set; }
         public int ProductId { get; set;}

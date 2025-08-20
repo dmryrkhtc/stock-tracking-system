@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using STS.Domain.Entities;
 
 namespace STS.Application.DTOs.Products
 {
-    class ProductReadDto
+   public class ProductReadDto
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string CompanyName { get; set; }//urunler hangi sirketten
+        public Unit Unit { get; set; }
+        public double? Price { get; set; }
+
     }
 }

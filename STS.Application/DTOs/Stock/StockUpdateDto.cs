@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace STS.Application.DTOs.Stock
 {
-    class StockUpdateDto
+   public  class StockUpdateDto
     {
         [Required]
         public Store Store { get; set; }

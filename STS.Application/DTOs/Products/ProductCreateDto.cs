@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using STS.Domain.Entities;//stsdomain uniti kullandigim icin
+using System.ComponentModel.DataAnnotations;
+
 
 namespace STS.Application.DTOs.Products
 {
-    class ProductCreateDto
+    public class ProductCreateDto
     {
+        [Required]
+        [StringLength(120)]
+        public string Name { get; set; }
+        [Required]
+         public Unit Unit { get; set; } //kilo litre parca
+        [Required]
+        public int CompanyId { get; set; } 
+        public double? Price { get; set; } //fiyat alani
+
     }
 }
