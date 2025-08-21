@@ -1,6 +1,8 @@
 using STS.Application.Mapping;
 using STS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using STS.Application.IRepositories;
+using STS.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,14 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 //dbcontext(connection string appsetting.json icinde)
 builder.Services.AddDbContext<STSDbContext>();
+
+// interfaceler infrastructure implementasyonlariyla eslesti
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 var app = builder.Build();
 
