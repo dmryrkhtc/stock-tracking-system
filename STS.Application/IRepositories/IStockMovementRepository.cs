@@ -1,4 +1,5 @@
-﻿using STS.Domain.Entities;
+﻿using STS.Application.DTOs.StockMovements;
+using STS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,10 @@ namespace STS.Application.IRepositories
     public interface IStockMovementRepository
     {
         //STOKHAREKETLERİ metod isimleri
-        Task<StockMovement> GetByIdAsync(int id);
-        Task<IEnumerable<StockMovement>> GetAllAsync();
-        Task AddAsync(StockMovement stockMovement);
-        void Update(StockMovement stockMovement);
-        void Delete(StockMovement stockMovement);
+        Task<StockMovementReadDto> GetByIdAsync(int id);
+        Task<IEnumerable<StockMovementReadDto>> GetAllAsync();
+        Task<StockMovementReadDto> AddAsync(StockMovementCreateDto stockMovement);
+        Task  UpdateAsync(StockMovementUpdateDto stockMovement);
+        Task DeleteAsync(int id);
     }
 }

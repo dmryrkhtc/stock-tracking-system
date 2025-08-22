@@ -32,7 +32,8 @@ namespace STS.Application.Mapping
             //User
             CreateMap<User, UserReadDto>();
             CreateMap<UserCreateDto, User>();
-            CreateMap<UserUpdateDto, User>();
+            CreateMap<UserUpdateInfoDto, User>();
+           
 
             //StockMovements
             CreateMap<StockMovement, StockMovementReadDto>();

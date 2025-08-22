@@ -1,7 +1,6 @@
+using STS.Application.IRepositories;
 using STS.Application.Mapping;
 using STS.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using STS.Application.IRepositories;
 using STS.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +31,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    app.UseSwaggerUI(option =>
+    {
+        option.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        option.RoutePrefix = string.Empty;
+    });
+
     app.UseSwaggerUI();
 }
 

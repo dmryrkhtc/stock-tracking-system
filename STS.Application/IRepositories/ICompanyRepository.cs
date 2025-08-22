@@ -1,4 +1,5 @@
-﻿using STS.Domain.Entities;
+﻿using STS.Application.DTOs.Companies;
+using STS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,10 @@ namespace STS.Application.IRepositories
     public interface ICompanyRepository
     {
         //COMPANY method isimleri,islemleri
-        Task<Company> GetByIdAsync(int id);
-        Task<IEnumerable<Company>> GetAllAsync();
-        Task AddAsync(Company company);
-        void Update(Company company);
-        void Delete(Company company);
+        Task<CompanyReadDto> GetByIdAsync(int id);
+        Task<IEnumerable<CompanyReadDto>> GetAllAsync();
+        Task<CompanyReadDto> AddAsync(CompanyCreateDto company);
+        Task UpdateAsync(CompanyUpdateDto company);
+        Task DeleteAsync(int id);
     }
 }

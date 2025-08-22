@@ -10,6 +10,9 @@ namespace STS.Application.DTOs.Stock
 {
    public  class StockUpdateDto
     {
+        public int Id { get; set; }
+
+
         [Required]
         public Store Store { get; set; }
         [Required]

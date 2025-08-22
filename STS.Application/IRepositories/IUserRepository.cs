@@ -2,15 +2,16 @@
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+using STS.Application.DTOs.Users;
 namespace STS.Application.IRepositories
 {
     public interface IUserRepository
     {
         // USER method isimleri var sadece
-        Task<User> GetByIdAsync(int id);
-        Task<IEnumerable<User>> GetAllAsync();
-        Task AddAsync(User user);
-        void Update(User user);
-        void Delete(User user);
+        Task<UserReadDto> GetByIdAsync(int id);
+        Task<IEnumerable<UserReadDto>> GetAllAsync();
+        Task<UserReadDto> AddAsync(UserCreateDto user);
+        Task UpdateAsync(UserUpdateInfoDto user);
+        Task DeleteAsync(int Id);
     }
 }

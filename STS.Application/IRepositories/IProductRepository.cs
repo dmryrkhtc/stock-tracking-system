@@ -1,21 +1,21 @@
-﻿using STS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using STS.Application.DTOs.Products;
+using STS.Domain.Entities;
 
 namespace STS.Application.IRepositories
 {
     public interface IProductRepository
     {
         //PRODUCT methodlari isimleri
-        Task<Product> GetByIdAsync(int id);
-        Task<IEnumerable<Product>> GetAllAsync();
-        Task AddAsync(Product product);
-        void Update(Product product);
-        void Delete(Product product);
+        //dto read metodlari
+        Task<ProductReadDto> GetByIdAsync(int id);
+        Task<IEnumerable<ProductReadDto>> GetAllAsync();
 
-
+        //dto create metodu
+        Task<ProductReadDto> AddAsync(ProductCreateDto product);
+      
+        //Productcontrollerda kullandigim delete ve update metodlarini tanisin diye buraya eklendi
+        //dto update metodu
+        Task UpdateAsync(ProductUpdateDto product);
+        Task DeleteAsync(int id);
     }
 }

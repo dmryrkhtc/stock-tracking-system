@@ -10,6 +10,8 @@ namespace STS.Application.DTOs.Stock
 {
     public class StockCreateDto
     {
+        public int Id { get; set; }
+        
         [Required]
         public int ProductId { get; set; }
         [Required]

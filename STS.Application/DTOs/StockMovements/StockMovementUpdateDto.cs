@@ -10,6 +10,7 @@ namespace STS.Application.DTOs.StockMovements
 {
     public class StockMovementUpdateDto
     {
+        public int Id { get; set; }
         [Required]
         public MovementType Type { get; set; }// girdi cikti durumu
         [Required]

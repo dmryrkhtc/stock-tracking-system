@@ -1,4 +1,5 @@
-﻿using STS.Domain.Entities;
+﻿using STS.Application.DTOs.Stock;
+using STS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,10 @@ namespace STS.Application.IRepositories
      public interface IStockRepository
     {
         //STOCK metod isimleri
-        Task<Stock> GetByIdAsync(int id);
-        Task<IEnumerable<Stock>> GetAllAsync();
-        Task AddAsync(Stock stock);
-        void Update(Stock stock);
-        void Delete(Stock stock);
+        Task<StockReadDto> GetByIdAsync(int id);
+        Task<IEnumerable<StockReadDto>> GetAllAsync();
+        Task<StockReadDto> AddAsync(StockCreateDto stock);
+        Task UpdateAsync(StockUpdateDto stock);
+        Task DeleteAsync(int id);
     }
 }
