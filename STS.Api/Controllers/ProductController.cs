@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using STS.Application.DTOs.Products;
 using STS.Application.IRepositories;
-// domaindeki entityleri kullanmamiz icin gerekli "Product"
-using STS.Domain.Entities;
+
 
 namespace STS.Api.Controllers
 //restapi route
@@ -22,8 +20,10 @@ namespace STS.Api.Controllers
         [HttpGet("ReadProductSummary")]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productRepository.GetAllAsync();
-            return Ok(products); // hepsi basariyla okundu
+            var result = await _productRepository.GetAllAsync();
+            if (!result.Success)
+                return NotFound(new { result.Message });
+            return Ok(result.Data);
         }
 
 
@@ -31,13 +31,13 @@ namespace STS.Api.Controllers
         [HttpGet("ReadProductById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var result = await _productRepository.GetByIdAsync(id);
             //id ile eslesen urun yoksa
-            if (product == null)
+            if (!result.Success)
             {
-                return NotFound();//404 bulunamadi
+                return NotFound(new {result.Message});//404 bulunamadi
             }
-            return Ok();//varsa basariyla okundu
+            return Ok(result.Data);//varsa basariyla okundu
         }
 
 
@@ -45,8 +45,16 @@ namespace STS.Api.Controllers
         [HttpPost("CreateProduct")]
         public async Task<IActionResult> Create(ProductCreateDto product)
         {
-            await _productRepository.AddAsync(product);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            var result = await _productRepository.AddAsync(product);
+            if (!result.Success)
+            { 
+                return BadRequest(new { result.Message });
+            }
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = result.Data.Id },//yeni eklenen ürün idsi
+                result.Data//yeni eklenen ürün dtosu
+                );
         }
 
 
@@ -54,9 +62,10 @@ namespace STS.Api.Controllers
         [HttpPut("UpdateProduct")]
         public async Task<IActionResult> Update( ProductUpdateDto product)
         {
-           
-            await _productRepository.UpdateAsync(product);
-            return NoContent(); //204 basariyla guncellendi
+            var result = await _productRepository.UpdateAsync(product);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+            return NoContent();//basarıyla guncellendi
         }
 
 
@@ -64,8 +73,10 @@ namespace STS.Api.Controllers
         [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _productRepository.DeleteAsync(id);
-            return NoContent();//204 basariyla idli silindi
+            var result = await _productRepository.DeleteAsync(id);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+            return NoContent();
         }
     }
 

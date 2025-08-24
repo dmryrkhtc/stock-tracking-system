@@ -1,4 +1,5 @@
-﻿using System;
+﻿using STS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,7 @@ namespace STS.Application.DTOs.Users
         public string LastName { get; set; }
         public string Email { get; set; }
         public string CompanyName { get; set; }// kullanicinin hangi sirkette oldugunu gormek istedgimizden
+        public Company Company { get; set; }
+        public int CompanyId { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using STS.Application.DTOs.Products;
 using STS.Domain.Entities;
+using STS.Domain.Response;
 
 namespace STS.Application.IRepositories
 {
@@ -7,15 +8,15 @@ namespace STS.Application.IRepositories
     {
         //PRODUCT methodlari isimleri
         //dto read metodlari
-        Task<ProductReadDto> GetByIdAsync(int id);
-        Task<IEnumerable<ProductReadDto>> GetAllAsync();
+        Task<ResultResponse<ProductReadDto>> GetByIdAsync(int id);
+        Task<ResultResponse<IEnumerable<ProductReadDto>>> GetAllAsync();
 
         //dto create metodu
-        Task<ProductReadDto> AddAsync(ProductCreateDto product);
-      
+        Task<ResultResponse<ProductReadDto>> AddAsync(ProductCreateDto product);
+
         //Productcontrollerda kullandigim delete ve update metodlarini tanisin diye buraya eklendi
         //dto update metodu
-        Task UpdateAsync(ProductUpdateDto product);
-        Task DeleteAsync(int id);
+        Task<ResultResponse<bool>> UpdateAsync(ProductUpdateDto product);
+        Task<ResultResponse<bool>> DeleteAsync(int id);
     }
 }

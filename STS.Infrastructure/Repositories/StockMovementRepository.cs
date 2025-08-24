@@ -82,6 +82,7 @@ namespace STS.Infrastructure.Repositories
             if (stockMovement == null)
                 return;
             _context.StockMovements.Attach(stockMovement);
+            await _context.SaveChangesAsync();
 
         }
 

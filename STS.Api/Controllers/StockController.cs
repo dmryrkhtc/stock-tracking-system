@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using STS.Application.DTOs.Stock;
 using STS.Application.IRepositories;
 
@@ -10,56 +9,75 @@ namespace STS.Api.Controllers
     public class StockController : ControllerBase
     {
         private readonly IStockRepository _stockRepository;
+
         public StockController(IStockRepository stockRepository)
         {
             _stockRepository = stockRepository;
         }
-        //STOCK READ
-        [HttpGet("ReadStockInf")]
 
+        // STOCK READ - ALL
+        [HttpGet("ReadStockInf")]
         public async Task<IActionResult> GetAll()
         {
-            var stocks = await _stockRepository.GetAllAsync();
-            return Ok(stocks); // tum stok bilgisi basariyla okundu
+            var result = await _stockRepository.GetAllAsync();
+
+            if (!result.Success)
+                return NotFound(new { result.Message });
+
+            return Ok(result.Data);
         }
 
-        //STOCK READ BY ID
+        // STOCK READ BY ID
         [HttpGet("ReadStockById/{id}")]
-
         public async Task<IActionResult> GetById(int id)
         {
-            var stock = await _stockRepository.GetByIdAsync(id);
-            if (stock == null)
-            {
-                return NotFound();
-            }
-            return Ok();
+            var result = await _stockRepository.GetByIdAsync(id);
+
+            if (!result.Success)
+                return NotFound(new { result.Message });
+
+            return Ok(result.Data);
         }
 
-        //STOCK CREATE EKLEME
+        // STOCK CREATE
         [HttpPost("CreateStock")]
-
         public async Task<IActionResult> Create(StockCreateDto stock)
         {
-            await _stockRepository.AddAsync(stock);
-            return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock);
+            var result = await _stockRepository.AddAsync(stock);
+
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = result.Data.Id },
+                result.Data
+            );
         }
 
-
-        //STOCK UPDATE
+        // STOCK UPDATE
         [HttpPut("UpdateStock")]
         public async Task<IActionResult> Update(StockUpdateDto stock)
         {
-            await _stockRepository.UpdateAsync(stock);
-            return NoContent();//basariyla guncellendi
+            var result = await _stockRepository.UpdateAsync(stock);
+
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+
+            return NoContent(); // 204 - başarıyla güncellendi
         }
 
-        //STOCK DELETE 
-        [HttpDelete("DeleteStock")]
+        // STOCK DELETE
+        [HttpDelete("DeleteStock/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _stockRepository.DeleteAsync(id);
-            return NoContent();
+            var result = await _stockRepository.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+
+            return NoContent(); // 204 - başarıyla silindi
         }
     }
 }
+

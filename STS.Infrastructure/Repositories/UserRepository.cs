@@ -1,107 +1,145 @@
-﻿using STS.Domain.Entities;
-using STS.Application.IRepositories;
-using STS.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using STS.Application.DTOs.Users;
-using System.Reflection.Metadata.Ecma335;
+using STS.Application.IRepositories;
+using STS.Domain.Entities;
+using STS.Domain.Response;
+using STS.Infrastructure.Data;
 
-namespace STS.Infrastructure.Repositories
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly STSDbContext _context;
+
+    public UserRepository(STSDbContext context)
     {
-        private readonly STSDbContext _context;
+        _context = context;
+    }
 
-        public UserRepository(STSDbContext context)
+    public async Task<ResultResponse<UserReadDto>> GetByIdAsync(int id)
+    {
+        try
         {
-            _context = context;
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return new ResultResponse<UserReadDto> { Success = false, Message = "Kullanıcı bulunamadı" };
+
+            var readDto = new UserReadDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                LastName = user.LastName,
+                Email = user.Email,
+                CompanyName = user.Company.Name
+            };
+
+            return new ResultResponse<UserReadDto> { Success = true, Message = "Kullanıcı bulundu", Data = readDto };
         }
-
-        public async Task<UserReadDto> GetByIdAsync(int id)
+        catch (Exception ex)
         {
-            return await _context.Users
-                                 .Where(u => u.Id == id)
-                                 .Select(u => new UserReadDto
-                                 {
-                                     Id = u.Id,
-                                     Name= u.Name,
-                                     LastName= u.LastName,
-                                     Email= u.Email,
-                                     CompanyName=u.Company.Name
-
-                                 })
-                                 .FirstOrDefaultAsync();
+            return new ResultResponse<UserReadDto> { Success = false, Message = $"Hata: {ex.Message}" };
         }
+    }
 
-        public async Task<IEnumerable<UserReadDto>> GetAllAsync()
+    public async Task<ResultResponse<IEnumerable<UserReadDto>>> GetAllAsync()
+    {
+        try
         {
-            return await _context.Users
-                                 .Select(u => new UserReadDto
-                                 {
-                                     Id = u.Id,
-                                     Name = u.Name,
-                                     LastName = u.LastName,
-                                     Email = u.Email,
-                                     CompanyName = u.Company.Name
-                                 })
-                                 .ToListAsync();
+            var users = await _context.Users.Include(u => u.Company).ToListAsync();
+            if (!users.Any())
+                return new ResultResponse<IEnumerable<UserReadDto>> { Success = false, Message = "Kullanıcı bulunamadı" };
+
+            var dtos = users.Select(u => new UserReadDto
+            {
+                Id = u.Id,
+                Name = u.Name,
+                LastName = u.LastName,
+                Email = u.Email,
+                CompanyName = u.Company.Name
+            }).ToList();
+
+            return new ResultResponse<IEnumerable<UserReadDto>> { Success = true, Message = "Kullanıcılar listelendi", Data = dtos };
         }
-
-        public async Task<UserReadDto> AddAsync(UserCreateDto dto)
+        catch (Exception ex)
         {
+            return new ResultResponse<IEnumerable<UserReadDto>> { Success = false, Message = $"Hata: {ex.Message}" };
+        }
+    }
+
+    public async Task<ResultResponse<UserReadDto>> AddAsync(UserCreateDto dto)
+    {
+        try
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == dto.Id);
+            if (existingUser != null)
+                return new ResultResponse<UserReadDto> { Success = false, Message = "Aynı kullanıcı mevcut" };
+
             var user = new User
             {
-                Id = dto.Id,
                 Name = dto.Name,
                 LastName = dto.LastName,
                 Email = dto.Email,
                 CompanyId = dto.CompanyId
             };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return new UserReadDto
+
+            var readDto = new UserReadDto
             {
-                Id=user.Id,
-                Name=user.Name,
-                LastName=user.LastName,
-                Email=user.Email,
-                CompanyName=user.Company.Name
-
+                Id = user.Id,
+                Name = user.Name,
+                LastName = user.LastName,
+                Email = user.Email,
+                CompanyName = user.Company.Name
             };
+
+            return new ResultResponse<UserReadDto> { Success = true, Message = "Kullanıcı eklendi", Data = readDto };
         }
-     
-
-
-        public async Task UpdateAsync(UserUpdateInfoDto userInfo)
+        catch (Exception ex)
         {
-            var vUser = await _context.Users
-                .Where(user => user.Id == userInfo.Id)
-                .Select(user => new User
-                {
-                    Id= user.Id,
-                    Name= user.Name,
-                    LastName=user.LastName,
-                    Email=user.Email
-                }).FirstOrDefaultAsync();
+            return new ResultResponse<UserReadDto> { Success = false, Message = $"Hata: {ex.Message}" };
+        }
+    }
 
-            if (vUser == null)
-                return;
+    public async Task<ResultResponse<bool>> UpdateAsync(UserUpdateInfoDto dto)
+    {
+        try
+        {
+            var user = await _context.Users.FindAsync(dto.Id);
+            if (user == null)
+                return new ResultResponse<bool> { Success = false, Message = "Kullanıcı bulunamadı" };
 
-            // vuser diye tablo yaptim ondaki degisiklik veritabindakine denk gelecek
-            _context.Users.Attach(vUser);
+            user.Name = dto.Name;
+            user.LastName = dto.LastName;
+            user.Email = dto.Email;
+            user.CompanyId = dto.CompanyId;
 
-            vUser.Name = userInfo.Name;
-            vUser.LastName = userInfo.LastName;
-            vUser.Email = userInfo.Email;
-
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
-        }
 
-        public async Task DeleteAsync(int id) {
-            var user = await _context.Users.FindAsync(id);
-            if (user!=null)
+            return new ResultResponse<bool> { Success = true, Message = "Kullanıcı güncellendi", Data = true };
+        }
+        catch (Exception ex)
         {
+            return new ResultResponse<bool> { Success = false, Message = $"Hata: {ex.Message}" };
+        }
+    }
+
+    public async Task<ResultResponse<bool>> DeleteAsync(int id)
+    {
+        try
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return new ResultResponse<bool> { Success = false, Message = "Kullanıcı bulunamadı" };
+
             _context.Users.Remove(user);
-           await _context.SaveChangesAsync();
-        } }
+            await _context.SaveChangesAsync();
+
+            return new ResultResponse<bool> { Success = true, Message = "Kullanıcı silindi", Data = true };
+        }
+        catch (Exception ex)
+        {
+            return new ResultResponse<bool> { Success = false, Message = $"Hata: {ex.Message}" };
+        }
     }
 }

@@ -16,13 +16,12 @@ namespace STS.Domain.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public double Price {get;set;}
-        public Unit Unit { get; set; } //enum degerleri 
-        public Company Company { get; set; }//Nav prop
-        public int CompanyId { get; set; }//fk
+        public string Barcode { get; set; }
+        public double Price { get; set; }
+        public Unit Unit { get; set; } //enum
+        public int CompanyId { get; set; } // FK
+        public Company Company { get; set; } // Nav prop
+        public ICollection<Stock> Stocks { get; set; } // one-to-many
         public ICollection<StockMovement> StockMovements { get; set; }
-        public ICollection<Stock> Stocks { get; set; }
-        public Stock Stock { get; set; }
-        public string CompanyName { get; set; }
     }
 }

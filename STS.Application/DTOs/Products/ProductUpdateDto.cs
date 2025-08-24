@@ -16,9 +16,14 @@ namespace STS.Application.DTOs.Products
         [StringLength(120)]
         public string Name { get; set; }
         [Required]
+            public Company Company { get; set; }
+        public int CompanyId { get; set; }
+        [Required]
         public Unit Unit { get; set; } //kilo litre parca
 
         public double Price { get; set; } //fiyat alani
+        [Required]
+        public string Barcode { get; set; }
        
 
     } 

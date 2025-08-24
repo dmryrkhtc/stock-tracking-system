@@ -9,6 +9,6 @@ namespace STS.Application.DTOs.Products
         public string CompanyName { get; set; }//urunler hangi sirketten
         public Unit Unit { get; set; }
         public double Price { get; set; }
-
+        public string Barcode { get; set; }
     }
 }

@@ -1,17 +1,14 @@
-﻿using STS.Domain.Entities;
-using System.Threading.Tasks;
-
-using System.Collections.Generic;
-using STS.Application.DTOs.Users;
+﻿using STS.Application.DTOs.Users;
+using STS.Domain.Response;
 namespace STS.Application.IRepositories
 {
     public interface IUserRepository
     {
         // USER method isimleri var sadece
-        Task<UserReadDto> GetByIdAsync(int id);
-        Task<IEnumerable<UserReadDto>> GetAllAsync();
-        Task<UserReadDto> AddAsync(UserCreateDto user);
-        Task UpdateAsync(UserUpdateInfoDto user);
-        Task DeleteAsync(int Id);
+        Task<ResultResponse<UserReadDto>> GetByIdAsync(int id);
+        Task<ResultResponse<IEnumerable<UserReadDto>>> GetAllAsync();
+        Task<ResultResponse<UserReadDto>> AddAsync(UserCreateDto user);
+        Task <ResultResponse<bool>>UpdateAsync(UserUpdateInfoDto user);
+        Task<ResultResponse<bool>> DeleteAsync(int Id);
     }
 }

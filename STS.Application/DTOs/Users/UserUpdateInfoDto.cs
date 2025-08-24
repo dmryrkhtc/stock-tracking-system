@@ -15,6 +15,6 @@ namespace STS.Application.DTOs.Users
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
+        public int CompanyId { get; set; }
     }
 }

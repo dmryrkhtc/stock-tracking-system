@@ -11,7 +11,7 @@ namespace STS.Infrastructure.Data
     public class STSDbContext : DbContext
     {
         public STSDbContext() { } //patameterless constructor
-        // onconfiguring eklemek yerine bunu kullandım program.cc üzerinden ayarlanacak
+        // onconfiguring eklemek yerine bunu kullandım program.cs üzerinden ayarlanacak
         public STSDbContext(DbContextOptions<STSDbContext> options) : base(options) { }
 
 
@@ -96,6 +96,7 @@ namespace STS.Infrastructure.Data
                 e.Property(x => x.Name).IsRequired().HasMaxLength(120);
                 //unit enum ek konfigurasyon gerektirmez int olarak saklanir
                 // string saklamak istersem e.Property(p=>p.Unit).HasConversion<string>();)
+                e.HasIndex(x => x.Barcode).IsUnique();
 
             });
 

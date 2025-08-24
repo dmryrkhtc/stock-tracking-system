@@ -1,20 +1,15 @@
 ﻿using STS.Application.DTOs.Companies;
-using STS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using STS.Domain.Response;
 
 namespace STS.Application.IRepositories
 {
     public interface ICompanyRepository
     {
         //COMPANY method isimleri,islemleri
-        Task<CompanyReadDto> GetByIdAsync(int id);
-        Task<IEnumerable<CompanyReadDto>> GetAllAsync();
-        Task<CompanyReadDto> AddAsync(CompanyCreateDto company);
-        Task UpdateAsync(CompanyUpdateDto company);
-        Task DeleteAsync(int id);
+        Task<ResultResponse<CompanyReadDto>> GetByIdAsync(int id);
+        Task<ResultResponse<IEnumerable<CompanyReadDto>>> GetAllAsync();
+        Task<ResultResponse<CompanyReadDto>> AddAsync(CompanyCreateDto company);
+        Task <ResultResponse<bool>> UpdateAsync(CompanyUpdateDto company);
+        Task<ResultResponse<bool>> DeleteAsync(int id);
     }
 }

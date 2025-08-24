@@ -16,6 +16,8 @@ namespace STS.Application.DTOs.Products
         [Required]
         public int CompanyId { get; set; } 
         public double Price { get; set; } //fiyat alani
+        [Required]
+        public string Barcode { get; set; }
 
     }
 }

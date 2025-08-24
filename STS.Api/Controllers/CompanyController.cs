@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using STS.Application.DTOs.Companies;
-using STS.Application.DTOs.Users;
 using STS.Application.IRepositories;
-using STS.Infrastructure.Repositories;
 
 namespace STS.Api.Controllers
 {
@@ -21,37 +18,55 @@ namespace STS.Api.Controllers
         [HttpGet("GetCompanySummary")]
         public async Task<IActionResult> GetAll()
         {
-            var companies = await _companyRepository.GetAllAsync();
-            return Ok(companies); //hepsi basariyla okundu
+            var result = await _companyRepository.GetAllAsync();
+            if (!result.Success)
+                return NotFound(new { result.Message });
+            return Ok(result.Data);//200+sirket listesi
         }
         [HttpGet("GetCompanyById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var company = await _companyRepository.GetByIdAsync(id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-            return Ok();
+            var result = await _companyRepository.GetByIdAsync(id);
+            if (!result.Success)
+                return NotFound(new { result.Message });
+           
+            return Ok(result.Data);//200+ilgili sirket
         }
 
         [HttpPost("CreateCompany")]
         public async Task<IActionResult> Create(CompanyCreateDto company)
         {
-            await _companyRepository.AddAsync(company);
-            return CreatedAtAction(nameof(GetById), new { id = company.Id }, company);
+            var result = await _companyRepository.AddAsync(company);
+
+            if (!result.Success)
+            {
+                return BadRequest(new { result.Message });
+            }
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = result.Data.Id },//yeni eklenen sirket idsi
+                result.Data//yeni eklenen sirket dtosu
+            );
         }
+
 
         [HttpPut("UpdateCompany")]
         public async Task<IActionResult> Update(CompanyUpdateDto company)
         {
-            await _companyRepository.UpdateAsync(company);
+            var result =await _companyRepository.UpdateAsync(company);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
             return NoContent();// 204 sirket basariyla guncellendi
         }
         [HttpDelete("DeleteCompany/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _companyRepository.DeleteAsync(id);
+           var result= await _companyRepository.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(new {result.Message
+                });
             return NoContent(); // sirket basariyla silindi
         }
 
