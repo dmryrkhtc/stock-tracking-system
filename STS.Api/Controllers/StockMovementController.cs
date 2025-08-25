@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SQLitePCL;
-using STS.Application.DTOs.Stock;
 using STS.Application.DTOs.StockMovements;
 using STS.Application.IRepositories;
 
@@ -11,60 +9,55 @@ namespace STS.Api.Controllers
     public class StockMovementController : ControllerBase
     {
         private readonly IStockMovementRepository _stockMovementRepository;
+
         public StockMovementController(IStockMovementRepository stockMovementRepository)
         {
             _stockMovementRepository = stockMovementRepository;
-
         }
 
-        //STOCKMOVEMENT READ 
         [HttpGet("ReadStockMovement")]
-
         public async Task<IActionResult> GetAll()
         {
-            var stockMovements = await _stockMovementRepository.GetAllAsync();
-            return Ok(stockMovements);//tum stok hareket bilgisi okundu
+            var result = await _stockMovementRepository.GetAllAsync();
+            if (!result.Success)
+                return NotFound(new { result.Message });
+            return Ok(result.Data);
         }
 
-        //STOCKMOVEMENT ID GORE READ
-        [HttpGet("ReadStockMovementById{id}")]
+        [HttpGet("ReadStockMovementById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-        var stockMovement = await _stockMovementRepository.GetByIdAsync(id);
-            if(stockMovement==null)
-            {
-                return NotFound();
-            }
-            return Ok(stockMovement);
-
-}
-        //STOCKMOVEMENT CREATE 
-        [HttpPost("CreateStockMovement")]
-        public async Task<IActionResult> Create(StockMovementCreateDto stockMovement)
-        {
-            await _stockMovementRepository.AddAsync(stockMovement);
-            return CreatedAtAction(nameof(GetById), new { id = stockMovement.Id }, stockMovement);
-        
-        
+            var result = await _stockMovementRepository.GetByIdAsync(id);
+            if (!result.Success)
+                return NotFound(new { result.Message });
+            return Ok(result.Data);
         }
 
-        //STOCKMOVEMENT UPDATE
-        [HttpPut("UpdateStockMovement")]
-        public async Task<IActionResult> Update(StockMovementUpdateDto stockMovement)
+        [HttpPost("CreateStockMovement")]
+        public async Task<IActionResult> Create(StockMovementCreateDto dto)
         {
-            await _stockMovementRepository.UpdateAsync(stockMovement);
+            var result = await _stockMovementRepository.AddAsync(dto);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
+            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result.Data);
+        }
+
+        [HttpPut("UpdateStockMovement")]
+        public async Task<IActionResult> Update(StockMovementUpdateDto dto)
+        {
+            var result = await _stockMovementRepository.UpdateAsync(dto);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
             return NoContent();
         }
 
-        //STOCKMOVEMENT DELETE
-        [HttpDelete("DeleteStockMovement")]
+        [HttpDelete("DeleteStockMovement/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _stockMovementRepository.DeleteAsync(id);
+            var result = await _stockMovementRepository.DeleteAsync(id);
+            if (!result.Success)
+                return BadRequest(new { result.Message });
             return NoContent();
         }
-
-
-
     }
 }

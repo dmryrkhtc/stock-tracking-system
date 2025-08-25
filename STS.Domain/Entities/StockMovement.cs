@@ -20,5 +20,7 @@ namespace STS.Domain.Entities
         public MovementType MovementType { get; set; }
         public double Quantity { get; set; } //+10 giris -5 cikis
         public DateTime Date { get; set; }
+        public Store Store { get; set; } //stok hareketi hangi depoya bagli
+
     }
 }

@@ -18,7 +18,10 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                                     .Include(u => u.Company)
+                                     .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
                 return new ResultResponse<UserReadDto> { Success = false, Message = "Kullanıcı bulunamadı" };
 
@@ -28,7 +31,7 @@ public class UserRepository : IUserRepository
                 Name = user.Name,
                 LastName = user.LastName,
                 Email = user.Email,
-                CompanyName = user.Company.Name
+                CompanyName = user.Company != null ? user.Company.Name : null
             };
 
             return new ResultResponse<UserReadDto> { Success = true, Message = "Kullanıcı bulundu", Data = readDto };
@@ -53,7 +56,7 @@ public class UserRepository : IUserRepository
                 Name = u.Name,
                 LastName = u.LastName,
                 Email = u.Email,
-                CompanyName = u.Company.Name
+                CompanyName = u.Company != null ? u.Company.Name : null
             }).ToList();
 
             return new ResultResponse<IEnumerable<UserReadDto>> { Success = true, Message = "Kullanıcılar listelendi", Data = dtos };
@@ -68,9 +71,15 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == dto.Id);
+            // ID kontrolü gereksiz çünkü otomatik atanıyor
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
             if (existingUser != null)
-                return new ResultResponse<UserReadDto> { Success = false, Message = "Aynı kullanıcı mevcut" };
+                return new ResultResponse<UserReadDto> { Success = false, Message = "Bu e-posta ile bir kullanıcı zaten mevcut" };
+
+            // CompanyId geçerlilik kontrolü
+            var companyExists = await _context.Companies.AnyAsync(c => c.Id == dto.CompanyId);
+            if (!companyExists)
+                return new ResultResponse<UserReadDto> { Success = false, Message = "Geçersiz şirket seçimi." };
 
             var user = new User
             {
@@ -83,13 +92,16 @@ public class UserRepository : IUserRepository
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            // CompanyName için Include ile tekrar çekiyoruz
+            var createdUser = await _context.Users.Include(u => u.Company).FirstOrDefaultAsync(u => u.Id == user.Id);
+
             var readDto = new UserReadDto
             {
-                Id = user.Id,
-                Name = user.Name,
-                LastName = user.LastName,
-                Email = user.Email,
-                CompanyName = user.Company.Name
+                Id = createdUser.Id,
+                Name = createdUser.Name,
+                LastName = createdUser.LastName,
+                Email = createdUser.Email,
+                CompanyName = createdUser.Company != null ? createdUser.Company.Name : null
             };
 
             return new ResultResponse<UserReadDto> { Success = true, Message = "Kullanıcı eklendi", Data = readDto };
@@ -107,13 +119,23 @@ public class UserRepository : IUserRepository
             var user = await _context.Users.FindAsync(dto.Id);
             if (user == null)
                 return new ResultResponse<bool> { Success = false, Message = "Kullanıcı bulunamadı" };
+            // Email çakışmasını kontrol et
+            var emailConflict = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == dto.Email && u.Id != dto.Id);
+            if (emailConflict != null)
+                return new ResultResponse<bool> { Success = false, Message = "Bu e-posta başka bir kullanıcı tarafından kullanılıyor." };
+            // CompanyId geçerlilik kontrolü
+            var companyExists = await _context.Companies.AnyAsync(c => c.Id == dto.CompanyId);
+            if (!companyExists)
+                return new ResultResponse<bool> { Success = false, Message = "Geçersiz şirket seçimi." };
+
+
 
             user.Name = dto.Name;
             user.LastName = dto.LastName;
             user.Email = dto.Email;
             user.CompanyId = dto.CompanyId;
 
-            _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
             return new ResultResponse<bool> { Success = true, Message = "Kullanıcı güncellendi", Data = true };

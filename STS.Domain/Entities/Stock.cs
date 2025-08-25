@@ -13,6 +13,6 @@
         public Product Product { get; set; }
         public double Quantity { get; set; }
         public Store Store { get; set; }//enum
-        public object ProductName { get; set; }
+        public string ProductName { get; set; }
     }
 }

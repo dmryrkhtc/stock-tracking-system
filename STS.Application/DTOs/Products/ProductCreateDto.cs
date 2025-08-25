@@ -7,8 +7,6 @@ namespace STS.Application.DTOs.Products
     public class ProductCreateDto
     {
         [Required]
-        public int Id { get; set; }
-        [Required]
         [StringLength(120)]
         public string Name { get; set; }
         [Required]

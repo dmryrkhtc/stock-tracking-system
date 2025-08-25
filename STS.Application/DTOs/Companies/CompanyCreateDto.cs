@@ -4,8 +4,7 @@ namespace STS.Application.DTOs.Companies
 {
     public class CompanyCreateDto
     {
-        [Required]
-        public int Id { get; set; }
+        
         [Required]
         [StringLength(150)]
         public string Name { get; set; }
@@ -17,11 +16,11 @@ namespace STS.Application.DTOs.Companies
         
         [StringLength(250)]
         public string Address { get; set; }
+        [Required]
 
-        
         [StringLength(20)]
         public string TelNo { get; set; }
-
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
 

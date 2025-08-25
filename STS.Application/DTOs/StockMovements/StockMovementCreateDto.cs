@@ -5,7 +5,7 @@ namespace STS.Application.DTOs.StockMovements
 {
     public class StockMovementCreateDto
     {
-        public int Id { get; set; }
+  
         [Required]
         public int ProductId { get; set; }
         [Required]
@@ -15,6 +15,8 @@ namespace STS.Application.DTOs.StockMovements
         public double Quantity { get; set; }
         [Required]
         public DateTime Date { get; set; }
+        [Required]
+        public Store Store { get; set; } // kullanici hangi depoya ekleyecegini secsin
 
     }
 }

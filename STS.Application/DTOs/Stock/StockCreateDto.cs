@@ -1,22 +1,17 @@
 ﻿using STS.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STS.Application.DTOs.Stock
 {
     public class StockCreateDto
     {
-        public int Id { get; set; }
         
         [Required]
         public int ProductId { get; set; }
         [Required]
         public Store Store { get; set; }
         [Required]
+        [Range(0.01,double.MaxValue,ErrorMessage ="Miktar 0'dan büyük olmalı.")]
         public double Quantity { get; set; }
     }
 }

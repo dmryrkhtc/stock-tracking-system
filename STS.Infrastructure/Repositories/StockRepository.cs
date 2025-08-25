@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using STS.Application.DTOs.Products;
 using STS.Application.DTOs.Stock;
 using STS.Application.IRepositories;
 using STS.Domain.Entities;
+using STS.Domain.Response;
 using STS.Infrastructure.Data;
 
 namespace STS.Infrastructure.Repositories
@@ -16,93 +16,214 @@ namespace STS.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<StockReadDto> GetByIdAsync(int id)
+        public async Task<ResultResponse<StockReadDto>> GetByIdAsync(int id)
         {
-
-
-            //STOCK ID GORE LİSTELE
-            return await _context.Stocks
-                                 .Where(s => s.Id == id)
-                                 .Select(s => new StockReadDto {
-                                     Id = s.Id,
-                                     ProductId=s.ProductId,
-                                     ProductName = s.Product.Name,
-                                     Quantity=s.Quantity,
-                                     Store=s.Store
-
-                                 })
-                                 .FirstOrDefaultAsync();
-        }
-
-        //STOCK LİSTELE
-        public async Task<IEnumerable<StockReadDto>> GetAllAsync()
-        {
-            return await _context.Stocks
-                                 .Select(s => new StockReadDto
-                                 { 
-                                     Id=s.Id,
-                                     ProductId=s.ProductId,
-                                     ProductName=s.Product.Name,
-                                     Quantity=s.Quantity,
-                                     Store=s.Store
-
-                                 })
-                                 .ToListAsync();
-        }
-
-        //STOCK EKLEME
-        public async Task<StockReadDto> AddAsync(StockCreateDto dto)
-        {
-            var stock = new Stock
+            try
             {
-                Id = dto.Id,
-                ProductId = dto.ProductId,
-                Store = dto.Store,
-                Quantity = dto.Quantity
+                var stock = await _context.Stocks
+                    .Include(s => s.Product)
+                    .FirstOrDefaultAsync(s => s.Id == id);
 
-            };
-            //attach()
-            _context.Stocks.Add(stock);
-            await _context.SaveChangesAsync();
-            return new StockReadDto
+                if (stock == null)
+                    return new ResultResponse<StockReadDto>
+                    {
+                        Success = false,
+                        Message = "Stok bulunamadı."
+                    };
+
+                var dto = new StockReadDto
+                {
+                    Id = stock.Id,
+                    ProductId = stock.ProductId,
+                    ProductName = stock.Product?.Name, // null check
+                    Quantity = stock.Quantity,
+                    Store = stock.Store
+                };
+
+                return new ResultResponse<StockReadDto>
+                {
+                    Success = true,
+                    Message = "Stok başarıyla bulundu.",
+                    Data = dto
+                };
+            }
+            catch (Exception ex)
             {
-                Id = stock.Id,
-                ProductId = stock.ProductId,
-                ProductName=stock.Product.Name,
-                Quantity=stock.Quantity,
-                Store=stock.Store
-
-            };
-
-
+                return new ResultResponse<StockReadDto>
+                {
+                    Success = false,
+                    Message = $"Stok getirilirken hata oluştu: {ex.Message}"
+                };
+            }
         }
 
-        public async Task UpdateAsync(StockUpdateDto dto)
+        public async Task<ResultResponse<IEnumerable<StockReadDto>>> GetAllAsync()
         {
-            var stock = await _context.Stocks
-                        .Where(stock => stock.Id == dto.Id)
-                        .Select(stock => new Stock
-                        {
-                            Id = stock.Id,
-                            Store = stock.Store,
-                            Quantity = stock.Quantity
+            try
+            {
+                var stocks = await _context.Stocks
+                    .Include(s => s.Product)
+                    .ToListAsync();
 
+                if (!stocks.Any())
+                    return new ResultResponse<IEnumerable<StockReadDto>>
+                    {
+                        Success = false,
+                        Message = "Kayıtlı stok bulunamadı."
+                    };
 
-                        }).FirstOrDefaultAsync();
-            if (stock == null)
-                return;
-            _context.Stocks.Attach(stock);
-            await _context.SaveChangesAsync();
+                var dtos = stocks.Select(s => new StockReadDto
+                {
+                    Id = s.Id,
+                    ProductId = s.ProductId,
+                    ProductName = s.Product?.Name,
+                    Quantity = s.Quantity,
+                    Store = s.Store
+                }).ToList();
 
+                return new ResultResponse<IEnumerable<StockReadDto>>
+                {
+                    Success = true,
+                    Message = "Stoklar başarıyla listelendi.",
+                    Data = dtos
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<IEnumerable<StockReadDto>>
+                {
+                    Success = false,
+                    Message = $"Stoklar getirilirken hata oluştu: {ex.Message}"
+                };
+            }
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<ResultResponse<StockReadDto>> AddAsync(StockCreateDto dto)
         {
-            var stock = await _context.Stocks.FindAsync(id);
-            if(stock != null)
+            try
             {
+                // Ürün kontrolü
+                var product = await _context.Products.FindAsync(dto.ProductId);
+                if (product == null)
+                    return new ResultResponse<StockReadDto> { Success = false, Message = "Geçersiz ürün ID." };
+
+                // Stok kontrolü: aynı ürün ve depo
+                var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.ProductId == dto.ProductId && s.Store == dto.Store);
+
+                if (stock != null)
+                    stock.Quantity += dto.Quantity;
+                else
+                    _context.Stocks.Add(new Stock { ProductId = dto.ProductId, Quantity = dto.Quantity, Store = dto.Store });
+
+                await _context.SaveChangesAsync();
+
+                var dtoRead = new StockReadDto
+                {
+                    Id = stock?.Id ?? 0,
+                    ProductId = dto.ProductId,
+                    ProductName = product.Name,
+                    Quantity = stock?.Quantity ?? dto.Quantity,
+                    Store = dto.Store
+                };
+
+                return new ResultResponse<StockReadDto> { Success = true, Message = "Stok başarıyla eklendi.", Data = dtoRead };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<StockReadDto> { Success = false, Message = $"Hata oluştu: {ex.Message}" };
+            }
+        }
+
+        public async Task<ResultResponse<bool>> UpdateAsync(StockUpdateDto dto)
+        {
+            try
+            {
+                //miktar negatif olamaz
+                if (dto.Quantity < 0)
+                    return new ResultResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Miktar negatif olamaz."
+                    };
+
+                var stock = await _context.Stocks.FindAsync(dto.Id);
+                if (stock == null)
+                    return new ResultResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Güncellenecek stok bulunamadı."
+                    };
+
+                // Store değiştiyse, yeni store’da aynı ürün var mı kontrol et
+                if (stock.Store != dto.Store)
+                {
+                    var targetStock = await _context.Stocks
+                        .FirstOrDefaultAsync(s => s.ProductId == stock.ProductId && s.Store == dto.Store);
+
+                    if (targetStock != null)
+                    {
+                        targetStock.Quantity += dto.Quantity;
+                        _context.Stocks.Remove(stock);
+                    }
+                    else
+                    {
+                        stock.Store = dto.Store;
+                        stock.Quantity = dto.Quantity;
+                    }
+                }
+                else
+                {
+                    stock.Quantity = dto.Quantity;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return new ResultResponse<bool>
+                {
+                    Success = true,
+                    Message = "Stok başarıyla güncellendi.",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<bool>
+                {
+                    Success = false,
+                    Message = $"Stok güncellenirken hata oluştu: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ResultResponse<bool>> DeleteAsync(int id)
+        {
+            try
+            {
+                var stock = await _context.Stocks.FindAsync(id);
+                if (stock == null)
+                    return new ResultResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Silinecek stok bulunamadı."
+                    };
+
                 _context.Stocks.Remove(stock);
                 await _context.SaveChangesAsync();
+
+                return new ResultResponse<bool>
+                {
+                    Success = true,
+                    Message = "Stok başarıyla silindi.",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<bool>
+                {
+                    Success = false,
+                    Message = $"Stok silinirken hata oluştu: {ex.Message}"
+                };
             }
         }
     }
