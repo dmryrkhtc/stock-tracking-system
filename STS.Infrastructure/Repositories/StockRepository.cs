@@ -102,35 +102,72 @@ namespace STS.Infrastructure.Repositories
         {
             try
             {
-                // Ürün kontrolü
+                // 1️⃣ Ürün kontrolü
                 var product = await _context.Products.FindAsync(dto.ProductId);
                 if (product == null)
-                    return new ResultResponse<StockReadDto> { Success = false, Message = "Geçersiz ürün ID." };
+                    return new ResultResponse<StockReadDto>
+                    {
+                        Success = false,
+                        Message = "Geçersiz ürün ID."
+                    };
 
-                // Stok kontrolü: aynı ürün ve depo
-                var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.ProductId == dto.ProductId && s.Store == dto.Store);
+                // 2️⃣ Store string'i enum'a çevir
+                if (!Enum.TryParse<Store>(dto.Store, true, out var storeEnum))
+                {
+                    return new ResultResponse<StockReadDto>
+                    {
+                        Success = false,
+                        Message = "Geçersiz depo değeri."
+                    };
+                }
+
+                // 3️⃣ Aynı ürün ve depo var mı kontrol et
+                var stock = await _context.Stocks
+                    .FirstOrDefaultAsync(s => s.ProductId == dto.ProductId && s.Store == storeEnum);
 
                 if (stock != null)
+                {
                     stock.Quantity += dto.Quantity;
+                }
                 else
-                    _context.Stocks.Add(new Stock { ProductId = dto.ProductId, Quantity = dto.Quantity, Store = dto.Store });
+                {
+                    stock = new Stock
+                    {
+                        ProductId = dto.ProductId,
+                        Quantity = dto.Quantity,
+                        Store = storeEnum,
+                        ProductName = product.Name  // boş kalmayacak
+                    };
+                    _context.Stocks.Add(stock);
+                }
 
+                // 4️⃣ Kaydet
                 await _context.SaveChangesAsync();
 
+                // 5️⃣ Dönüş DTO
                 var dtoRead = new StockReadDto
                 {
-                    Id = stock?.Id ?? 0,
+                    Id = stock.Id,
                     ProductId = dto.ProductId,
                     ProductName = product.Name,
-                    Quantity = stock?.Quantity ?? dto.Quantity,
-                    Store = dto.Store
+                    Quantity = stock.Quantity,
+                    Store = stock.Store
                 };
 
-                return new ResultResponse<StockReadDto> { Success = true, Message = "Stok başarıyla eklendi.", Data = dtoRead };
+                return new ResultResponse<StockReadDto>
+                {
+                    Success = true,
+                    Message = "Stok başarıyla eklendi.",
+                    Data = dtoRead
+                };
             }
             catch (Exception ex)
             {
-                return new ResultResponse<StockReadDto> { Success = false, Message = $"Hata oluştu: {ex.Message}" };
+                return new ResultResponse<StockReadDto>
+                {
+                    Success = false,
+                    Message = $"Hata oluştu: {ex.Message}"
+                };
             }
         }
 

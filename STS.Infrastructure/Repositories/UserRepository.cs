@@ -31,7 +31,8 @@ public class UserRepository : IUserRepository
                 Name = user.Name,
                 LastName = user.LastName,
                 Email = user.Email,
-                CompanyName = user.Company != null ? user.Company.Name : null
+                CompanyName = user.Company != null ? user.Company.Name : null,
+                CompanyId=user.CompanyId
             };
 
             return new ResultResponse<UserReadDto> { Success = true, Message = "Kullanıcı bulundu", Data = readDto };
@@ -56,7 +57,8 @@ public class UserRepository : IUserRepository
                 Name = u.Name,
                 LastName = u.LastName,
                 Email = u.Email,
-                CompanyName = u.Company != null ? u.Company.Name : null
+                CompanyName = u.Company != null ? u.Company.Name : null,
+                CompanyId = u.CompanyId
             }).ToList();
 
             return new ResultResponse<IEnumerable<UserReadDto>> { Success = true, Message = "Kullanıcılar listelendi", Data = dtos };

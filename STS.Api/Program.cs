@@ -3,6 +3,8 @@ using STS.Application.Mapping;
 using STS.Infrastructure.Data;
 using STS.Infrastructure.Repositories;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 //controllers [apicontroller] aktif edildi
@@ -23,6 +25,7 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<IStockMovementRepository, StockMovementRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddControllers();
 
 
 var app = builder.Build();

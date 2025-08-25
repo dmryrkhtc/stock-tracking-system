@@ -202,6 +202,7 @@ namespace STS.Infrastructure.Repositories
                 product.Price = dto.Price;
                 product.CompanyId = dto.CompanyId;
                 product.Unit = parsedUnit;
+                product.Barcode = dto.Barcode;
 
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();

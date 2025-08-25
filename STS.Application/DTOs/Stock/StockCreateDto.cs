@@ -1,5 +1,5 @@
 ﻿using STS.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;//***
 
 namespace STS.Application.DTOs.Stock
 {
@@ -9,9 +9,13 @@ namespace STS.Application.DTOs.Stock
         [Required]
         public int ProductId { get; set; }
         [Required]
-        public Store Store { get; set; }
+        public string Store { get; set; }
+      
+
         [Required]
         [Range(0.01,double.MaxValue,ErrorMessage ="Miktar 0'dan büyük olmalı.")]
         public double Quantity { get; set; }
+
+   
     }
 }

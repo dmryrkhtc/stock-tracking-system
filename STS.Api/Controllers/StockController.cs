@@ -41,7 +41,7 @@ namespace STS.Api.Controllers
 
         // STOCK CREATE
         [HttpPost("CreateStock")]
-        public async Task<IActionResult> Create(StockCreateDto stock)
+        public async Task<IActionResult> Create([FromBody]StockCreateDto stock)
         {
             var result = await _stockRepository.AddAsync(stock);
 
