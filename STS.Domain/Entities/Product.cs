@@ -8,9 +8,9 @@ namespace STS.Domain.Entities
 {
     public enum Unit
     {
-        Kg,
-        Piece,
-        Liter
+        Kg=0,
+        Piece=2,
+        Liter=1
     }
     public class Product
     {

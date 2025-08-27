@@ -19,6 +19,7 @@ public class ProductUpdateDto
     public double Price { get; set; } //fiyat alani
     [Required]
     public string Barcode { get; set; }
+    
 
 
     } 

@@ -2,6 +2,7 @@ using STS.Application.IRepositories;
 using STS.Application.Mapping;
 using STS.Infrastructure.Data;
 using STS.Infrastructure.Repositories;
+using System.Text.Json.Serialization;
 
 
 
@@ -11,6 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//api string dönderiyor
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 
 //automapper (application katmanindaki profile bulur)
@@ -28,7 +36,22 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddControllers();
 
 
+
+
+
+
+// cors policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact", builder =>
+
+        builder.WithOrigins("http://localhost:3000")//react portu
+         .AllowAnyHeader()
+         .AllowAnyMethod());
+});
+
 var app = builder.Build();
+
 
 // Swagger middleware
 if (app.Environment.IsDevelopment())
@@ -47,7 +70,7 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();//controller route baglamak
 app.UseAuthorization();
 app.UseHttpsRedirection();
-
+app.UseCors("AllowReact");//cors aktif
 
 
 //uygulamayi baslat

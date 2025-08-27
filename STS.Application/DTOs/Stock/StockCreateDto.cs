@@ -1,5 +1,5 @@
 ﻿using STS.Domain.Entities;
-using System.ComponentModel.DataAnnotations;//***
+using System.ComponentModel.DataAnnotations;//***arastir
 
 namespace STS.Application.DTOs.Stock
 {

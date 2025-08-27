@@ -3,8 +3,8 @@
 
     public enum Store
     {
-        Store1,
-        Store2
+        Market=0,
+        Depo = 1
     }
     public class Stock
     {
