@@ -45,14 +45,10 @@ namespace STS.Api.Controllers
         {
             var result = await _stockRepository.AddAsync(stock);
 
-            if (!result.Success)
-                return BadRequest(new { result.Message });
+            //if (!result.Success)
+            //    return BadRequest(new { result.Message }); //400 donduruyor
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = result.Data.Id },
-                result.Data
-            );
+            return Ok(result);
         }
 
         // STOCK UPDATE

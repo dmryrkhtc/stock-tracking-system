@@ -44,7 +44,8 @@ namespace STS.Infrastructure.Repositories
                         Barcode = product.Barcode,
                         Price = product.Price,
                         Unit = product.Unit,
-                        CompanyName = product.Company?.Name
+                        CompanyId = product.CompanyId
+                 
                     }
                 };
             }

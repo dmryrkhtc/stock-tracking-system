@@ -29,7 +29,8 @@ namespace STS.Infrastructure.Repositories
                                                  Quantity = m.Quantity,
                                                  Date = m.Date,
                                                  ProductName = m.Product.Name,
-                                                 Type = m.MovementType
+                                                 Type = m.MovementType,
+                                                 Store=m.Store
                                              })
                                              .FirstOrDefaultAsync();
 
@@ -69,7 +70,9 @@ namespace STS.Infrastructure.Repositories
                         Quantity = m.Quantity,
                         Date = m.Date,
                         ProductName = m.Product.Name,
-                        Type = m.MovementType
+                        Type = m.MovementType,
+                        Store=m.Store
+                        
                     }).ToListAsync();
 
                 return new ResultResponse<IEnumerable<StockMovementReadDto>>
@@ -122,7 +125,9 @@ namespace STS.Infrastructure.Repositories
                     ProductId = dto.ProductId,
                     MovementType = dto.Type,
                     Quantity = dto.Quantity,
-                    Date = dto.Date
+                    Date = dto.Date,
+       
+                    Store=dto.Store
                 };
                 _context.StockMovements.Add(movement);
 

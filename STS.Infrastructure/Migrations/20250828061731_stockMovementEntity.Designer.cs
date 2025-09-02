@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using STS.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using STS.Infrastructure.Data;
 namespace STS.Infrastructure.Migrations
 {
     [DbContext(typeof(STSDbContext))]
-    partial class STSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250828061731_stockMovementEntity")]
+    partial class stockMovementEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,9 +110,6 @@ namespace STS.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -123,12 +123,7 @@ namespace STS.Infrastructure.Migrations
                     b.Property<int>("Store")
                         .HasColumnType("int");
 
-                    b.Property<int>("Unit")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("ProductId", "Store")
                         .IsUnique();
@@ -217,19 +212,11 @@ namespace STS.Infrastructure.Migrations
 
             modelBuilder.Entity("STS.Domain.Entities.Stock", b =>
                 {
-                    b.HasOne("STS.Domain.Entities.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("STS.Domain.Entities.Product", "Product")
                         .WithMany("Stocks")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Company");
 
                     b.Navigation("Product");
                 });

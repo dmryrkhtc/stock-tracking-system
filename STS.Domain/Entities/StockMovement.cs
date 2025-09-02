@@ -8,8 +8,8 @@ namespace STS.Domain.Entities
 {
     public enum MovementType
     {
-        Entry,
-        Exit
+        Entry=0,
+        Exit=1
     }
        
     public class StockMovement

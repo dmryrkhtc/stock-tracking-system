@@ -35,7 +35,7 @@ namespace STS.Infrastructure.Repositories
                 {
                     Id = stock.Id,
                     ProductId = stock.ProductId,
-                    ProductName = stock.Product?.Name, // null check
+                    ProductName = stock.Product?.Name,
                     Quantity = stock.Quantity,
                     Store = stock.Store
                 };
@@ -64,13 +64,6 @@ namespace STS.Infrastructure.Repositories
                 var stocks = await _context.Stocks
                     .Include(s => s.Product)
                     .ToListAsync();
-
-                if (!stocks.Any())
-                    return new ResultResponse<IEnumerable<StockReadDto>>
-                    {
-                        Success = false,
-                        Message = "Kayıtlı stok bulunamadı."
-                    };
 
                 var dtos = stocks.Select(s => new StockReadDto
                 {
@@ -102,7 +95,6 @@ namespace STS.Infrastructure.Repositories
         {
             try
             {
-                // 1️⃣ Ürün kontrolü
                 var product = await _context.Products.FindAsync(dto.ProductId);
                 if (product == null)
                     return new ResultResponse<StockReadDto>
@@ -111,40 +103,45 @@ namespace STS.Infrastructure.Repositories
                         Message = "Geçersiz ürün ID."
                     };
 
-                // 2️⃣ Store string'i enum'a çevir
                 if (!Enum.TryParse<Store>(dto.Store, true, out var storeEnum))
-                {
                     return new ResultResponse<StockReadDto>
                     {
-                        Success = false,
-                        Message = "Geçersiz depo değeri."
-                    };
-                }
+                       
 
-                // 3️⃣ Aynı ürün ve depo var mı kontrol et
+
+
+
+
+
+
+
+
+
+                    };
+
                 var stock = await _context.Stocks
                     .FirstOrDefaultAsync(s => s.ProductId == dto.ProductId && s.Store == storeEnum);
 
                 if (stock != null)
                 {
-                    stock.Quantity += dto.Quantity;
-                }
-                else
-                {
-                    stock = new Stock
+                    return new ResultResponse<StockReadDto>
                     {
-                        ProductId = dto.ProductId,
-                        Quantity = dto.Quantity,
-                        Store = storeEnum,
-                        ProductName = product.Name  // boş kalmayacak
+                        Success = false,
+                        Message = "Bu depoda zaten aynı ürün mevcut."
                     };
-                    _context.Stocks.Add(stock);
                 }
 
-                // 4️⃣ Kaydet
+                stock = new Stock
+                {
+                    ProductId = dto.ProductId,
+                    Quantity = dto.Quantity,
+                    Store = storeEnum,
+                    ProductName = product.Name
+                };
+
+                _context.Stocks.Add(stock);
                 await _context.SaveChangesAsync();
 
-                // 5️⃣ Dönüş DTO
                 var dtoRead = new StockReadDto
                 {
                     Id = stock.Id,
@@ -175,7 +172,6 @@ namespace STS.Infrastructure.Repositories
         {
             try
             {
-                //miktar negatif olamaz
                 if (dto.Quantity < 0)
                     return new ResultResponse<bool>
                     {
@@ -191,27 +187,23 @@ namespace STS.Infrastructure.Repositories
                         Message = "Güncellenecek stok bulunamadı."
                     };
 
-                // Store değiştiyse, yeni store’da aynı ürün var mı kontrol et
+                // Eğer depo değişmişse aynı depoda ürün var mı kontrol et
                 if (stock.Store != dto.Store)
                 {
                     var targetStock = await _context.Stocks
                         .FirstOrDefaultAsync(s => s.ProductId == stock.ProductId && s.Store == dto.Store);
 
                     if (targetStock != null)
-                    {
-                        targetStock.Quantity += dto.Quantity;
-                        _context.Stocks.Remove(stock);
-                    }
-                    else
-                    {
-                        stock.Store = dto.Store;
-                        stock.Quantity = dto.Quantity;
-                    }
+                        return new ResultResponse<bool>
+                        {
+                            Success = false,
+                            Message = "Hedef depoda zaten aynı ürün var."
+                        };
+
+                    stock.Store = dto.Store; // Depo değiştirilebilir
                 }
-                else
-                {
-                    stock.Quantity = dto.Quantity;
-                }
+
+                stock.Quantity = dto.Quantity;
 
                 await _context.SaveChangesAsync();
 

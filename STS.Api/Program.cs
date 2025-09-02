@@ -43,7 +43,7 @@ builder.Services.AddControllers();
 // cors policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReact", builder =>
+    options.AddPolicy("AllowReactApp", builder =>
 
         builder.WithOrigins("http://localhost:3000")//react portu
          .AllowAnyHeader()
@@ -65,14 +65,14 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowReactApp");//cors aktif
 //middleware sirasi
-app.MapControllers();//controller route baglamak
-app.UseAuthorization();
+app.UseRouting();
 app.UseHttpsRedirection();
-app.UseCors("AllowReact");//cors aktif
 
+app.UseAuthorization();
 
 //uygulamayi baslat
+app.MapControllers();//controller route baglamak
 
 app.Run();// DbContext: appsettings.json -> ConnectionStrings:DefaultConnection

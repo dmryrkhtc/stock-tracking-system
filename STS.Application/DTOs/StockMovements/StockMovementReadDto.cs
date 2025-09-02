@@ -9,5 +9,6 @@ namespace STS.Application.DTOs.StockMovements
         public double Quantity { get; set; }
         public DateTime Date { get; set; }
         public string ProductName { get;set; } //hangi urun hareketi
+        public Store Store { get; set; }
     }
 }
