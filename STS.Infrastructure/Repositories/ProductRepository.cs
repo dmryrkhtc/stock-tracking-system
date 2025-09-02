@@ -82,7 +82,8 @@ namespace STS.Infrastructure.Repositories
                     Barcode = p.Barcode,
                     Price = p.Price,
                     Unit = p.Unit,
-                    CompanyName = p.Company?.Name
+                    CompanyName = p.Company?.Name,
+                    CompanyId=p.CompanyId
                 }).ToList();
 
                 return new ResultResponse<IEnumerable<ProductReadDto>>
@@ -187,6 +188,18 @@ namespace STS.Infrastructure.Repositories
                     {
                         Success = false,
                         Message = "Güncellenecek ürün bulunamadı."
+                    };
+                }
+                // Barkod eşsiz mi kontrolü
+                var existingBarcode = await _context.Products
+                    .AnyAsync(p => p.Barcode == dto.Barcode && p.Id != dto.Id);
+
+                if (existingBarcode)
+                {
+                    return new ResultResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Bu barkod başka bir ürüne ait. Lütfen farklı bir barkod giriniz."
                     };
                 }
 

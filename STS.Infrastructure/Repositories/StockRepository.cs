@@ -106,16 +106,7 @@ namespace STS.Infrastructure.Repositories
                 if (!Enum.TryParse<Store>(dto.Store, true, out var storeEnum))
                     return new ResultResponse<StockReadDto>
                     {
-                       
-
-
-
-
-
-
-
-
-
+                      
 
                     };
 

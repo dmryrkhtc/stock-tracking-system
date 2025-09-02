@@ -58,7 +58,7 @@ namespace STS.Api.Controllers
             var result = await _stockRepository.UpdateAsync(stock);
 
             if (!result.Success)
-                return BadRequest(new { result.Message });
+                return BadRequest(result);
 
             return NoContent(); // 204 - başarıyla güncellendi
         }

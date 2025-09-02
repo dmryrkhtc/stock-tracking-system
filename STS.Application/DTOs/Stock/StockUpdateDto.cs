@@ -7,7 +7,8 @@ namespace STS.Application.DTOs.Stock
     {
         [Required]
         public int Id { get; set; }
-
+        [Required]
+        public int ProductId { get; set; }
 
         [Required]
         public Store Store { get; set; }
