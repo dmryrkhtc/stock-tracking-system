@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using STS.Application.DTOs.Stock;
 using STS.Application.IRepositories;
+using STS.Domain.Response;
 
 namespace STS.Api.Controllers
 {
@@ -57,10 +58,7 @@ namespace STS.Api.Controllers
         {
             var result = await _stockRepository.UpdateAsync(stock);
 
-            if (!result.Success)
-                return BadRequest(result);
-
-            return NoContent(); // 204 - başarıyla güncellendi
+            return Ok(result); // 204 - başarıyla güncellendi
         }
 
         // STOCK DELETE
@@ -69,11 +67,11 @@ namespace STS.Api.Controllers
         {
             var result = await _stockRepository.DeleteAsync(id);
 
-            if (!result.Success)
-                return BadRequest(new { result.Message });
+          
 
-            return NoContent(); // 204 - başarıyla silindi
+            return Ok(result); // 204 - başarıyla silindi
         }
+       
     }
 }
 

@@ -9,6 +9,7 @@ namespace STS.Application.DTOs.Stock
         public string ProductName { get; set; }
         public Store Store { get; set; }
         public double Quantity { get; set; }
+        public Unit Unit { get; set; }
 
     }
 }

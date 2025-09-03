@@ -1,4 +1,6 @@
-﻿namespace STS.Domain.Entities
+﻿using System.Security.Principal;
+
+namespace STS.Domain.Entities
 {
 
     public enum Store
@@ -14,5 +16,6 @@
         public double Quantity { get; set; }
         public Store Store { get; set; }//enum
         public string ProductName { get; set; }
+   
     }
 }

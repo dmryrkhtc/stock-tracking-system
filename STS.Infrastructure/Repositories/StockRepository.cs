@@ -37,7 +37,8 @@ namespace STS.Infrastructure.Repositories
                     ProductId = stock.ProductId,
                     ProductName = stock.Product?.Name,
                     Quantity = stock.Quantity,
-                    Store = stock.Store
+                    Store = stock.Store,
+                    Unit=stock.Product.Unit
                 };
 
                 return new ResultResponse<StockReadDto>
@@ -71,7 +72,11 @@ namespace STS.Infrastructure.Repositories
                     ProductId = s.ProductId,
                     ProductName = s.Product?.Name,
                     Quantity = s.Quantity,
-                    Store = s.Store
+                    Store = s.Store,
+                    Unit = s.Product.Unit
+
+
+
                 }).ToList();
 
                 return new ResultResponse<IEnumerable<StockReadDto>>
@@ -246,5 +251,7 @@ namespace STS.Infrastructure.Repositories
                 };
             }
         }
+      
+
     }
 }

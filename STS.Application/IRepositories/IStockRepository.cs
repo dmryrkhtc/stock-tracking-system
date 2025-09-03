@@ -17,6 +17,8 @@ namespace STS.Application.IRepositories
         Task<ResultResponse<StockReadDto>> AddAsync(StockCreateDto stock);
         Task<ResultResponse<bool>> UpdateAsync(StockUpdateDto stock);
         Task <ResultResponse< bool>>DeleteAsync(int id);
-        
+       
+
+
     }
 }
